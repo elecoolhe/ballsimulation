@@ -4,6 +4,28 @@ All notable changes to this project are recorded here.
 
 本文件用于记录项目的重要版本变化。
 
+## v1.3.0
+
+Ball-ball elastic collision version.
+
+小球-小球弹性碰撞版本。
+
+- Added ideal elastic collisions between balls in `multi_ball_chaos_simulation.py`.
+- Added overlap correction to reduce sticking after collisions.
+- Added real-time total collision count display.
+- Added real-time total kinetic energy display.
+- Updated `PHYSICS_MODEL.md` with ball-ball collision equations and revised calculation steps.
+- Updated README to describe the collision-enabled version.
+
+中文：
+
+- 在 `multi_ball_chaos_simulation.py` 中新增小球之间的理想弹性碰撞。
+- 增加重叠修正，减少碰撞后小球黏连。
+- 增加实时累计碰撞次数显示。
+- 增加实时系统总动能显示。
+- 更新 `PHYSICS_MODEL.md`，加入小球-小球碰撞方程和新版计算步骤。
+- 更新 README，说明支持弹性碰撞的新版本。
+
 ## v1.2.0
 
 Current stable version.

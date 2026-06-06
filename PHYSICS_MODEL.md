@@ -10,9 +10,9 @@ This document describes the physical assumptions, parameter settings, equations,
 
 ## 1. 建模目标
 
-The program simulates 30 point-like balls moving inside a two-dimensional square box. Each ball has a random initial position and velocity. The balls elastically reflect from the box boundary. The program also computes a simple system chaos index over time.
+The program simulates 30 equal-mass balls moving inside a two-dimensional square box. Each ball has a random initial position and velocity. The balls elastically reflect from the box boundary and collide elastically with each other. The program also computes a simple system chaos index over time.
 
-程序模拟 30 个近似质点小球在二维方形边界内运动。每个小球具有随机初始位置和随机速度。小球碰到边界后发生理想反射。程序同时计算一个简化的系统混乱度指标，并记录其随时间的变化。
+程序模拟 30 个等质量小球在二维方形边界内运动。每个小球具有随机初始位置和随机速度。小球碰到边界后发生理想反射，小球之间也发生理想弹性碰撞。程序同时计算一个简化的系统混乱度指标，并记录其随时间的变化。
 
 ## 2. Physical Assumptions
 
@@ -26,13 +26,13 @@ The program simulates 30 point-like balls moving inside a two-dimensional square
 
   每个小球被视为具有可见半径的运动粒子。
 
-- Balls collide only with the square boundary.
+- Balls collide with the square boundary and with each other.
 
-  小球只与方形边界发生碰撞。
+  小球与方形边界以及其他小球发生碰撞。
 
-- Ball-ball collisions are not included in this version.
+- Ball-ball collisions assume equal mass and ideal elasticity.
 
-  当前版本不计算小球之间的相互碰撞。
+  小球之间的碰撞假设为等质量理想弹性碰撞。
 
 - Boundary collisions are ideal elastic reflections.
 
@@ -144,9 +144,75 @@ This is equivalent to an ideal elastic reflection from a fixed wall. The speed m
 
 这等价于小球与固定墙面发生理想弹性反射。碰撞后速度大小不变，仅对应方向分量变号。
 
-## 7. Chaos Index Definition
+## 7. Ball-Ball Elastic Collision Equations
 
-## 7. 混乱度指标定义
+## 7. 小球-小球弹性碰撞方程
+
+For balls `i` and `j`, define the center-to-center vector:
+
+对于小球 `i` 和 `j`，定义两球中心连线向量：
+
+```text
+r = (x_j - x_i, y_j - y_i)
+d = sqrt((x_j - x_i)^2 + (y_j - y_i)^2)
+```
+
+A collision is detected when:
+
+当满足以下条件时认为发生碰撞：
+
+```text
+d < 2 * BALL_RADIUS
+```
+
+The collision normal is:
+
+碰撞法线方向为：
+
+```text
+n = r / d = (n_x, n_y)
+```
+
+The program first corrects overlap to prevent balls from sticking together:
+
+程序首先修正重叠距离，避免小球黏连：
+
+```text
+overlap = 2 * BALL_RADIUS - d
+x_i = x_i - n_x * overlap / 2
+y_i = y_i - n_y * overlap / 2
+x_j = x_j + n_x * overlap / 2
+y_j = y_j + n_y * overlap / 2
+```
+
+The relative normal velocity is:
+
+相对法向速度为：
+
+```text
+p = dot(v_i - v_j, n)
+```
+
+Only approaching balls are resolved. If `p <= 0`, the balls are already moving apart along the normal direction and only the overlap correction is kept.
+
+程序只处理正在相互靠近的小球。如果 `p <= 0`，说明两球已经沿法线方向远离，此时只保留重叠修正。
+
+For equal-mass ideal elastic collision, the normal velocity components are exchanged:
+
+对于等质量理想弹性碰撞，沿法线方向的速度分量发生交换：
+
+```text
+v_i' = v_i - p * n
+v_j' = v_j + p * n
+```
+
+The tangential velocity components remain unchanged. In the ideal model, total kinetic energy is approximately conserved except for numerical and discrete-time errors.
+
+切向速度分量保持不变。在理想模型中，除数值误差和离散时间步误差外，总动能近似守恒。
+
+## 8. Chaos Index Definition
+
+## 8. 混乱度指标定义
 
 This project uses a simplified, observable chaos index rather than a strict thermodynamic entropy or Lyapunov exponent. It combines position dispersion and velocity dispersion.
 
@@ -207,9 +273,9 @@ The result is approximately in the range `0` to `100`.
 
 计算结果大致落在 `0` 到 `100` 的范围内。
 
-## 8. Calculation Steps
+## 9. Calculation Steps
 
-## 8. 计算步骤
+## 9. 计算步骤
 
 Each frame follows these steps:
 
@@ -227,37 +293,45 @@ Each frame follows these steps:
 
    如果发生边界碰撞，则反转对应方向的速度分量。
 
-4. Draw each ball at its updated position.
+4. Detect and resolve ball-ball elastic collisions.
+
+   检测并处理小球之间的理想弹性碰撞。
+
+5. Correct overlap between colliding balls.
+
+   修正发生碰撞的小球之间的重叠。
+
+6. Draw each ball at its updated position.
 
    将每个小球绘制到更新后的位置。
 
-5. Compute the system chaos index.
+7. Compute the system chaos index, total collision count, and total kinetic energy.
 
-   计算系统混乱度。
+   计算系统混乱度、累计碰撞次数和系统总动能。
 
-6. Append the current time and chaos value to the history arrays.
+8. Append the current time and chaos value to the history arrays.
 
    将当前时间和混乱度追加到历史数据中。
 
-7. Update the on-screen chaos value and live curve.
+9. Update the on-screen chaos value, collision count, energy value, and live curve.
 
-   更新窗口中的混乱度数值和实时曲线。
+   更新窗口中的混乱度数值、碰撞次数、能量数值和实时曲线。
 
-8. When the window closes, save `chaos_history.csv` and `chaos_over_time.png`.
+10. When the window closes, save `chaos_history.csv` and `chaos_over_time.png`.
 
    关闭窗口后，保存 `chaos_history.csv` 和 `chaos_over_time.png`。
 
-## 9. Model Limitations
+## 10. Model Limitations
 
-## 9. 模型局限
+## 10. 模型局限
 
-- No ball-ball collision is modeled.
+- Ball-ball collisions assume equal mass and equal radius.
 
-  没有模拟小球之间的碰撞。
+  小球之间的碰撞假设所有小球具有相同质量和相同半径。
 
-- No mass, force, or acceleration is used.
+- No gravity, friction, rotational motion, or acceleration is used.
 
-  没有引入质量、力或加速度。
+  没有引入重力、摩擦、旋转运动或加速度。
 
 - The chaos index is a descriptive engineering metric, not a rigorous entropy measurement.
 
@@ -267,17 +341,17 @@ Each frame follows these steps:
 
   时间单位以程序帧更新为基础，并不是经过物理标定的真实秒级动力学模型。
 
-## 10. Possible Future Improvements
+## 11. Possible Future Improvements
 
-## 10. 后续可改进方向
+## 11. 后续可改进方向
 
-- Add elastic collisions between balls.
+- Add different masses and radii for different balls.
 
-  增加小球之间的弹性碰撞。
+  为不同小球增加不同质量和半径。
 
-- Add mass and momentum conservation.
+- Add explicit momentum and energy conservation diagnostics.
 
-  引入质量和动量守恒。
+  增加更明确的动量和能量守恒诊断。
 
 - Add gravity or external force fields.
 

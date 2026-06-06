@@ -32,21 +32,30 @@ class Ball:
         self.dx = dx
         self.dy = dy
 
-    def move(self):
-        next_x = self.x + self.dx
-        next_y = self.y + self.dy
+    def advance(self):
+        self.x += self.dx
+        self.y += self.dy
 
-        if next_x > BORDER - BALL_RADIUS or next_x < -BORDER + BALL_RADIUS:
+    def handle_wall_collision(self):
+        if self.x > BORDER - BALL_RADIUS:
+            self.x = BORDER - BALL_RADIUS
             self.dx *= -1
-            next_x = self.x + self.dx
+        elif self.x < -BORDER + BALL_RADIUS:
+            self.x = -BORDER + BALL_RADIUS
+            self.dx *= -1
 
-        if next_y > BORDER - BALL_RADIUS or next_y < -BORDER + BALL_RADIUS:
+        if self.y > BORDER - BALL_RADIUS:
+            self.y = BORDER - BALL_RADIUS
             self.dy *= -1
-            next_y = self.y + self.dy
+        elif self.y < -BORDER + BALL_RADIUS:
+            self.y = -BORDER + BALL_RADIUS
+            self.dy *= -1
 
-        self.x = next_x
-        self.y = next_y
+    def draw(self):
         self.turtle.goto(SIM_CENTER_X + self.x, SIM_CENTER_Y + self.y)
+
+    def speed_squared(self):
+        return self.dx * self.dx + self.dy * self.dy
 
 
 def create_writer(color="white"):
@@ -131,6 +140,58 @@ def calculate_chaos(balls):
     velocity_score = min(velocity_spread / max_velocity_spread, 1.0)
 
     return (0.65 * position_score + 0.35 * velocity_score) * 100
+
+
+def calculate_total_kinetic_energy(balls):
+    return sum(0.5 * ball.speed_squared() for ball in balls)
+
+
+def resolve_ball_collisions(balls):
+    collision_count = 0
+    min_distance = BALL_RADIUS * 2
+
+    for i in range(len(balls)):
+        for j in range(i + 1, len(balls)):
+            first = balls[i]
+            second = balls[j]
+
+            delta_x = second.x - first.x
+            delta_y = second.y - first.y
+            distance = math.hypot(delta_x, delta_y)
+
+            if distance > min_distance:
+                continue
+
+            if distance == 0:
+                angle = random.uniform(0, math.tau)
+                normal_x = math.cos(angle)
+                normal_y = math.sin(angle)
+                distance = 0.001
+            else:
+                normal_x = delta_x / distance
+                normal_y = delta_y / distance
+
+            overlap = min_distance - distance
+            correction = overlap / 2
+            first.x -= normal_x * correction
+            first.y -= normal_y * correction
+            second.x += normal_x * correction
+            second.y += normal_y * correction
+
+            relative_dx = first.dx - second.dx
+            relative_dy = first.dy - second.dy
+            normal_speed = relative_dx * normal_x + relative_dy * normal_y
+
+            if normal_speed <= 0:
+                continue
+
+            first.dx -= normal_speed * normal_x
+            first.dy -= normal_speed * normal_y
+            second.dx += normal_speed * normal_x
+            second.dy += normal_speed * normal_y
+            collision_count += 1
+
+    return collision_count
 
 
 def draw_live_graph(graph_pen, chaos_history):
@@ -222,21 +283,31 @@ def main():
     time_history = []
     chaos_history = []
     frame_counter = 0
+    total_collision_count = 0
 
     def update():
-        nonlocal frame_counter
+        nonlocal frame_counter, total_collision_count
 
         for ball in balls:
-            ball.move()
+            ball.advance()
+            ball.handle_wall_collision()
+
+        total_collision_count += resolve_ball_collisions(balls)
+
+        for ball in balls:
+            ball.handle_wall_collision()
+            ball.draw()
 
         elapsed = time.perf_counter() - start_time
         chaos = calculate_chaos(balls)
+        energy = calculate_total_kinetic_energy(balls)
         time_history.append(round(elapsed, 3))
         chaos_history.append(round(chaos, 4))
 
         info_writer.clear()
         info_writer.write(
-            f"Balls: {BALL_COUNT}   Time: {elapsed:6.2f}s   Chaos: {chaos:6.2f}",
+            f"Balls: {BALL_COUNT}   Time: {elapsed:6.2f}s   "
+            f"Chaos: {chaos:6.2f}   Collisions: {total_collision_count}   Energy: {energy:7.2f}",
             align="left",
             font=("Arial", 12, "normal"),
         )

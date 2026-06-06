@@ -80,9 +80,9 @@ The new version is available in:
 multi_ball_chaos_simulation.py
 ```
 
-It simulates 30 balls with random initial positions and velocities, displays the current system chaos value in real time, and draws a live chaos curve in the Turtle window.
+It simulates 30 balls with random initial positions and velocities, includes ideal elastic collisions between balls, displays the current system chaos value, total collision count, and total kinetic energy in real time, and draws a live chaos curve in the Turtle window.
 
-它会模拟 30 个小球的随机初始位置和随机速度，在 Turtle 窗口中实时显示当前系统混乱度，并绘制实时混乱度曲线。
+它会模拟 30 个小球的随机初始位置和随机速度，包含小球之间的理想弹性碰撞，并在 Turtle 窗口中实时显示当前系统混乱度、累计碰撞次数和系统总动能，同时绘制实时混乱度曲线。
 
 Run it with:
 
@@ -125,9 +125,9 @@ PHYSICS_MODEL.md
 
   PyInstaller 打包配置文件。
 
-- `multi_ball_chaos_simulation.py`: 30-ball chaos simulation source code.
+- `multi_ball_chaos_simulation.py`: 30-ball chaos simulation source code with ball-ball elastic collisions.
 
-  30 个小球混乱度模拟的新版本源码。
+  包含小球-小球弹性碰撞的 30 个小球混乱度模拟源码。
 
 - `PHYSICS_MODEL.md`: physical modeling and calculation notes.
 
