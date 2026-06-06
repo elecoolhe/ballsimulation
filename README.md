@@ -105,6 +105,14 @@ The chaos value combines position dispersion and velocity dispersion. A higher v
 
 混乱度由位置分散度和速度分散度共同计算得到。数值越高，表示小球在空间上越分散，速度方向和大小也越不一致。
 
+The physical model, parameter settings, equations, and calculation steps are documented in:
+
+物理建模、参数设定、计算方程和计算步骤说明见：
+
+```text
+PHYSICS_MODEL.md
+```
+
 ## Repository Contents
 
 ## 仓库内容
@@ -120,6 +128,10 @@ The chaos value combines position dispersion and velocity dispersion. A higher v
 - `multi_ball_chaos_simulation.py`: 30-ball chaos simulation source code.
 
   30 个小球混乱度模拟的新版本源码。
+
+- `PHYSICS_MODEL.md`: physical modeling and calculation notes.
+
+  物理建模与计算说明文档。
 
 - `build.bat` and `build_ball_simulation.bat`: Windows build helpers.
 
