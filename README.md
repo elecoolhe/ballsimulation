@@ -60,6 +60,14 @@ The built executable is expected at:
 dist\ball_simulation.exe
 ```
 
+A preserved PyInstaller build snapshot is available at:
+
+已保留的一次 PyInstaller 打包现场备份位于：
+
+```text
+pyinstaller_build_backup\
+```
+
 ## Repository Contents
 
 ## 仓库内容
@@ -76,10 +84,10 @@ dist\ball_simulation.exe
 
   Windows 下使用的构建辅助脚本。
 
-- `dist\ball_simulation.exe`: restored packaged executable.
+- `pyinstaller_build_backup\dist\ball_simulation.exe`: restored packaged executable.
 
   已复原的打包可执行程序。
 
-- PyInstaller build artifacts are also preserved in this repository.
+- `pyinstaller_build_backup\build\ball_simulation\`: preserved PyInstaller build artifacts.
 
-  仓库中也保留了 PyInstaller 生成的构建产物。
+  已保留的 PyInstaller 构建中间产物，可用于查询打包现场和排查依赖问题。
