@@ -68,6 +68,43 @@ A preserved PyInstaller build snapshot is available at:
 pyinstaller_build_backup\
 ```
 
+## Multi-ball Chaos Version
+
+## 多小球混乱度版本
+
+The new version is available in:
+
+新版程序位于：
+
+```text
+multi_ball_chaos_simulation.py
+```
+
+It simulates 30 balls with random initial positions and velocities, displays the current system chaos value in real time, and draws a live chaos curve in the Turtle window.
+
+它会模拟 30 个小球的随机初始位置和随机速度，在 Turtle 窗口中实时显示当前系统混乱度，并绘制实时混乱度曲线。
+
+Run it with:
+
+运行方式：
+
+```powershell
+python multi_ball_chaos_simulation.py
+```
+
+When the window is closed, the program saves:
+
+关闭窗口后，程序会保存：
+
+```text
+chaos_history.csv
+chaos_over_time.png
+```
+
+The chaos value combines position dispersion and velocity dispersion. A higher value means the balls are more spatially spread out and their velocity vectors are more varied.
+
+混乱度由位置分散度和速度分散度共同计算得到。数值越高，表示小球在空间上越分散，速度方向和大小也越不一致。
+
 ## Repository Contents
 
 ## 仓库内容
@@ -79,6 +116,10 @@ pyinstaller_build_backup\
 - `ball_simulation.spec`: PyInstaller build specification.
 
   PyInstaller 打包配置文件。
+
+- `multi_ball_chaos_simulation.py`: 30-ball chaos simulation source code.
+
+  30 个小球混乱度模拟的新版本源码。
 
 - `build.bat` and `build_ball_simulation.bat`: Windows build helpers.
 

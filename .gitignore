@@ -6,3 +6,5 @@ __pycache__/
 venv/
 /build/
 /dist/
+chaos_history.csv
+chaos_over_time.png
